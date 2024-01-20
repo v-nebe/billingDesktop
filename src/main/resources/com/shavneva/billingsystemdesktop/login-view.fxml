@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" prefHeight="367.0" prefWidth="546.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shavneva.billingsystemdesktop.ButtonController">
+  <padding>
+    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+  </padding>
+   <children>
+      <BorderPane prefHeight="200.0" prefWidth="200.0">
+         <top>
+            <Label text="Введите данные чтобы войти в систему" BorderPane.alignment="CENTER" />
+         </top>
+         <center>
+            <GridPane prefHeight="122.0" prefWidth="506.0" BorderPane.alignment="CENTER">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="288.0" minWidth="10.0" prefWidth="288.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="258.0" minWidth="10.0" prefWidth="218.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints maxHeight="129.0" minHeight="10.0" prefHeight="129.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="169.0" minHeight="10.0" prefHeight="118.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label prefHeight="32.0" prefWidth="234.0" text="Номер телефона или e-mail" />
+                  <TextField prefHeight="31.0" prefWidth="218.0" GridPane.columnIndex="1" />
+                  <PasswordField prefHeight="34.0" prefWidth="218.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label text="Пароль" GridPane.rowIndex="1" />
+               </children>
+            </GridPane>
+         </center>
+      </BorderPane>
+      <Button mnemonicParsing="false" onAction="#openUserWindowClick" prefHeight="40.0" prefWidth="190.0" text="Войти" />
+      <Button mnemonicParsing="false" onAction="#openRegistrationWindowClick" prefHeight="40.0" prefWidth="194.0" text="Зарегестрироваться" />
+   </children>
+</VBox>
