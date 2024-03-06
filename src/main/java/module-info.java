@@ -10,6 +10,8 @@ module com.shavneva.billingsystemdesktop {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires java.net.http;
+    requires com.fasterxml.jackson.databind;
 
     opens com.shavneva.billingsystemdesktop to javafx.fxml;
     exports com.shavneva.billingsystemdesktop;

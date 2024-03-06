@@ -30,14 +30,14 @@
             <Label text="Номер телефона" GridPane.rowIndex="2" />
             <Label text="Почта" GridPane.rowIndex="3" />
             <Label contentDisplay="CENTER" text="Пароль" GridPane.rowIndex="4" />
-            <TextField prefHeight="32.0" prefWidth="253.0" GridPane.columnIndex="1" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <PasswordField GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <PasswordField GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextField fx:id="name" prefHeight="32.0" prefWidth="253.0" GridPane.columnIndex="1" />
+            <TextField fx:id="surname" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="phoneNumber" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="email" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <PasswordField fx:id="repeatedPassword" GridPane.columnIndex="1" GridPane.rowIndex="5" />
          </children>
       </GridPane>
-      <Button mnemonicParsing="false" onAction="#openUserWindowClick" prefHeight="40.0" prefWidth="190.0" text="Зарегестрироваться" />
+      <Button mnemonicParsing="false" onAction="#openUWindowClick" prefHeight="40.0" prefWidth="190.0" text="Зарегестрироваться" />
    </children>
 </VBox>

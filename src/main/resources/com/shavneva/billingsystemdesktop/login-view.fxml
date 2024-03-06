@@ -25,8 +25,8 @@
               </rowConstraints>
                <children>
                   <Label prefHeight="32.0" prefWidth="234.0" text="Номер телефона или e-mail" />
-                  <TextField prefHeight="31.0" prefWidth="218.0" GridPane.columnIndex="1" />
-                  <PasswordField prefHeight="34.0" prefWidth="218.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="login" id="login" prefHeight="31.0" prefWidth="218.0" GridPane.columnIndex="1" />
+                  <PasswordField fx:id="passwordField" prefHeight="34.0" prefWidth="218.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Label text="Пароль" GridPane.rowIndex="1" />
                </children>
             </GridPane>
