@@ -4,18 +4,24 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="362.0" prefWidth="454.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="362.0" prefWidth="454.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shavneva.billingdesktop.ButtonController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
           <Menu mnemonicParsing="false" text="Профиль">
             <items>
-              <MenuItem mnemonicParsing="false" text="Об аккаунте" />
-                  <MenuItem mnemonicParsing="false" text="Выйти" />
+                    <MenuItem mnemonicParsing="false" onAction="#handleAboutMenuItem" text="Об аккаунте" />
+                    <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#handleAboutExit" text="Выйти" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Настройки" />
-          <Menu mnemonicParsing="false" text="Помощь" />
+          <Menu mnemonicParsing="false" text="Настройки">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#openSettingsMenuItem" text="Показать" />
+               </items></Menu>
+          <Menu mnemonicParsing="false" text="Помощь">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#openHelpMenuItem" text="Показать" />
+               </items></Menu>
         </menus>
       </MenuBar>
    </top>
@@ -53,7 +59,7 @@
                <GridPane.margin>
                   <Insets left="10.0" />
                </GridPane.margin></Label>
-            <Button mnemonicParsing="false" text="Ознакомиться" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+            <Button mnemonicParsing="false" onAction="#openWindowAboutTariffs" text="Ознакомиться" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
          </children>
       </GridPane>
    </center>

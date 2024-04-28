@@ -11,6 +11,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <resteasy.version>4.7.2.Final</resteasy.version>
 <junit.version>5.10.0</junit.version>  </properties>
 
   <dependencies>
@@ -119,6 +120,17 @@
       <artifactId>lombok</artifactId>
       <optional>true</optional>
       <version>1.18.30</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-client</artifactId>
+      <version>${resteasy.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
     </dependency>
   </dependencies>
 

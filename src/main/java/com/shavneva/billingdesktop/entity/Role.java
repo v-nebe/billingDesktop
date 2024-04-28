@@ -1,6 +1,5 @@
 package com.shavneva.billingdesktop.entity;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,12 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Role {
 
-    //private Integer userId;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String number;
-    private String password;
+    private Long roleId;
+    private String roleName;
 }

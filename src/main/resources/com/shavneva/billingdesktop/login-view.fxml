@@ -4,31 +4,34 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="367.0" prefWidth="546.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shavneva.billingdesktop.ButtonController">
+<VBox alignment="CENTER" prefHeight="326.0" prefWidth="429.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shavneva.billingdesktop.ButtonController">
   <padding>
     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
   </padding>
    <children>
-      <BorderPane prefHeight="200.0" prefWidth="200.0">
+      <BorderPane prefHeight="168.0" prefWidth="380.0">
          <top>
-            <Label text="Введите данные чтобы войти в систему" BorderPane.alignment="CENTER" />
+            <Label prefHeight="35.0" prefWidth="222.0" text="Введите данные чтобы войти в систему" textAlignment="CENTER" BorderPane.alignment="CENTER" />
          </top>
          <center>
-            <GridPane prefHeight="122.0" prefWidth="506.0" BorderPane.alignment="CENTER">
+            <GridPane prefHeight="160.0" prefWidth="387.0" BorderPane.alignment="CENTER">
               <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="288.0" minWidth="10.0" prefWidth="288.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="258.0" minWidth="10.0" prefWidth="218.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="288.0" minWidth="10.0" prefWidth="200.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="258.0" minWidth="10.0" prefWidth="186.0" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints maxHeight="129.0" minHeight="10.0" prefHeight="129.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="169.0" minHeight="10.0" prefHeight="118.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="129.0" minHeight="10.0" prefHeight="77.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="169.0" minHeight="10.0" prefHeight="83.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <Label prefHeight="32.0" prefWidth="234.0" text="Номер телефона или e-mail" />
-                  <TextField fx:id="login" id="login" prefHeight="31.0" prefWidth="218.0" GridPane.columnIndex="1" />
+                  <TextField id="login" fx:id="login" prefHeight="31.0" prefWidth="218.0" GridPane.columnIndex="1" />
                   <PasswordField fx:id="passwordField" prefHeight="34.0" prefWidth="218.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Label text="Пароль" GridPane.rowIndex="1" />
+                  <Label text="Пароль" textAlignment="RIGHT" GridPane.rowIndex="1" />
                </children>
+               <opaqueInsets>
+                  <Insets left="1000.0" />
+               </opaqueInsets>
             </GridPane>
          </center>
       </BorderPane>

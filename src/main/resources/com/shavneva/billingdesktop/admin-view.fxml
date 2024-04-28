@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shavneva.billingdesktop.ButtonController">
+   <children>
+      <BorderPane prefHeight="400.0" prefWidth="600.0">
+         <top>
+            <MenuBar BorderPane.alignment="CENTER">
+              <menus>
+                <Menu mnemonicParsing="false" text="Пользователи">
+                  <items>
+                    <MenuItem mnemonicParsing="false" onAction="#showTable" text="Показать" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Тарифы">
+                  <items>
+                    <MenuItem mnemonicParsing="false" onAction="#showTable" text="Показать" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Услуги">
+                  <items>
+                    <MenuItem mnemonicParsing="false" onAction="#showTable" text="Показать" />
+                  </items>
+                </Menu>
+                  <Menu mnemonicParsing="false" text="Счета">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#showTable" text="Показать" />
+                    </items>
+                  </Menu>
+              </menus>
+            </MenuBar>
+         </top>
+         <center>
+            <Label text="Добро пожаловать, администратор! Чтобы ознакомиится и начать работу с данными таблиц,выберите в MenuBar одну из позиций и нажмите &quot;Показать&quot;" textAlignment="CENTER" wrapText="true" BorderPane.alignment="CENTER">
+               <font>
+                  <Font size="18.0" />
+               </font></Label>
+         </center>
+         <left>
+            <ImageView fitHeight="248.0" fitWidth="275.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+               <image>
+                  <Image url="@images/9703596.png" />
+               </image>
+            </ImageView>
+         </left></BorderPane>
+   </children>
+</AnchorPane>
