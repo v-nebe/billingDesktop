@@ -1,5 +1,6 @@
 package com.shavneva.billingdesktop.repository.factory;
 
+import com.shavneva.billingdesktop.repository.AddAuthHeadersRequestFilter;
 import com.shavneva.billingdesktop.repository.IServerApplicationCrud;
 import com.shavneva.billingdesktop.repository.CrudRepository;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -10,8 +11,9 @@ public class CrudFactory {
 
     public static <T> CrudRepository<T> create(Class<T> type) {
         ResteasyClient client = (ResteasyClient) ResteasyClientBuilder.newClient();
+        client.register(AddAuthHeadersRequestFilter.class);
         IServerApplicationCrud<T> proxy = client.target(BASE_URL + "/" + type.getSimpleName().toLowerCase())
                 .proxy(IServerApplicationCrud.class);
-        return new CrudRepository<>(type, proxy);
+        return new CrudRepository<>(client, proxy);
     }
 }
