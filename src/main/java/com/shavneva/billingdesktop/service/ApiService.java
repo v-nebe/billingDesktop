@@ -21,7 +21,7 @@ public class ApiService {
         SecurityContext.setUsername(userName);
         SecurityContext.setPassword(password);
 
-        CrudRepository<User> userRepository = CrudFactory.create(User.class);
+        CrudRepository<User> userRepository = CrudFactory.createUserRepository();
         List<User> users = userRepository.getAll();
 
         if (!users.isEmpty()) {
@@ -34,22 +34,17 @@ public class ApiService {
 
     public static void registerUser(String firstName, String lastName, String email, String phoneNumber,
                                     String password, Consumer<Boolean> callback) {
-        Client client = ClientBuilder.newClient();
-        CrudRepository<User> userRepository = CrudFactory.create(User.class);
 
         User user = new User(firstName, lastName, email, phoneNumber, password);
-        Response response = client.target(BASE_URL + "/users/create")
-                .request()
-                .post(Entity.json(user));
+        CrudRepository<User> userRepository = CrudFactory.createUserRepository();
+        userRepository.create(user);
+        callback.accept(true);
 
-        int status = response.getStatus();
-        if (status == 200) {
+ /*       try {
+            userRepository.create(user);
             callback.accept(true);
-        } else {
+        } catch (Exception e) {
             callback.accept(false);
-        }
-
-        response.close();
-        client.close();
+        }*/
     }
 }

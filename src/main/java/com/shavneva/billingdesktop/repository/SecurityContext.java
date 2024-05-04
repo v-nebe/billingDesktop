@@ -1,7 +1,7 @@
 package com.shavneva.billingdesktop.repository;
 
 public class SecurityContext {
-    private static String username;
+    private static String username = null;
     private static String password;
 
     public static String getUsername() {

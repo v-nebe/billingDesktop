@@ -8,7 +8,9 @@ import java.util.Base64;
 public class AddAuthHeadersRequestFilter implements ClientRequestFilter {
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
-        String credentials = SecurityContext.getUsername() + ":" + SecurityContext.getPassword();
+        String userName = SecurityContext.getUsername();
+        if (userName == null) return;
+        String credentials = userName + ":" + SecurityContext.getPassword();
         String base64Credentials = Base64.getEncoder().encodeToString(credentials.getBytes());
         requestContext.getHeaders().add("Authorization", "Basic " + base64Credentials);
     }
