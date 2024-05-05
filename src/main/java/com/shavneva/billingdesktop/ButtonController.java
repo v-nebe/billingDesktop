@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -31,6 +32,10 @@ public class ButtonController {
     private PasswordField passwordField;
     @FXML
     private TextField repeatedPassword;
+    @FXML
+    private CheckBox smsCheckBox;
+    @FXML
+    private CheckBox emailCheckBox;
     Image icon = new Image(LoginApplication.class.getResourceAsStream("/com/shavneva/billingdesktop/images/icon.png"));
 
     @FXML
@@ -97,7 +102,7 @@ public class ButtonController {
 
             // Загрузить FXML-файл окна пользователя
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("admin-view.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("userwindow-view.fxml"));
 
             // Создать сцену и установить ее в новое окно
             Scene scene = new Scene(fxmlLoader.load());
@@ -138,13 +143,35 @@ public class ButtonController {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Настройки");
         alert.setHeaderText(null);
+
+        smsCheckBox = new CheckBox("SMS уведомления");
+        emailCheckBox = new CheckBox("Email уведомления");
+        smsCheckBox.setSelected(false);
+        emailCheckBox.setSelected(false);
+        alert.getDialogPane().setContent(new VBox(smsCheckBox, emailCheckBox));
+
         alert.showAndWait();
     }
 
     public void openHelpMenuItem(ActionEvent event) {
+        String helpContent = "Руководство пользователя для приложения управления биллинговой системой\n\n" +
+                "1. Вкладка 'Профиль':\n" +
+                "   - Во вкладке 'Профиль' вы можете просмотреть и отредактировать информацию о своем профиле\n" +
+                "   - Информация о профиле может включать личные данные, такие как имя, фамилия, email и номер телефона\n" +
+                "   - Для сохранения изменений нажмите кнопку 'Сохранить'\n" +
+                "2. Настройки уведомлений:\n" +
+                "   - Для настройки уведомлений выберите соответствующие опции в окне 'Настройки'\n" +
+                "   - Опции могут включать выбор типа уведомлений (SMS, email и т. д.) и настройки частоты получения уведомлений\n" +
+                "3. Просмотр тарифов:\n" +
+                "   - Для просмотра доступных тарифов нажмите кнопку 'Тарифы'\n" +
+                "   - В открывшемся окне отобразится список доступных тарифов\n" +
+                "4. Выход из приложения:\n" +
+                "   - Для выхода из приложения нажмите кнопку 'Выход'\n" +
+                "   - Подтвердите желание выйти из приложения в появившемся диалоговом окне\n\n" +
+                "Благодарим за использование нашего приложения!";
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Помощь");
-        alert.setHeaderText(null);
+        alert.setHeaderText(helpContent);
         alert.showAndWait();
     }
 

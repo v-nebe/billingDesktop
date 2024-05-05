@@ -39,12 +39,5 @@ public class ApiService {
         CrudRepository<User> userRepository = CrudFactory.createUserRepository();
         userRepository.create(user);
         callback.accept(true);
-
- /*       try {
-            userRepository.create(user);
-            callback.accept(true);
-        } catch (Exception e) {
-            callback.accept(false);
-        }*/
     }
 }
