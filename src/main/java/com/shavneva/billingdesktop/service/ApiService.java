@@ -1,5 +1,6 @@
 package com.shavneva.billingdesktop.service;
 
+import com.shavneva.billingdesktop.entity.Role;
 import com.shavneva.billingdesktop.entity.User;
 import com.shavneva.billingdesktop.repository.AddAuthHeadersRequestFilter;
 import com.shavneva.billingdesktop.repository.CrudRepository;
@@ -35,9 +36,13 @@ public class ApiService {
     public static void registerUser(String firstName, String lastName, String email, String phoneNumber,
                                     String password, Consumer<Boolean> callback) {
 
-        User user = new User(firstName, lastName, email, phoneNumber, password);
+        User user = new User(firstName, lastName, email, phoneNumber, password, null, null);
         CrudRepository<User> userRepository = CrudFactory.createUserRepository();
         userRepository.create(user);
         callback.accept(true);
+    }
+
+    public static Role getRoleName() {
+        return  null;
     }
 }

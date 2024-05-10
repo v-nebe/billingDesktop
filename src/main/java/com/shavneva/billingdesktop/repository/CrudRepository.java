@@ -1,5 +1,6 @@
 package com.shavneva.billingdesktop.repository;
 
+import com.shavneva.billingdesktop.repository.interfaces.IServerApplicationCrud;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 
 import java.util.List;

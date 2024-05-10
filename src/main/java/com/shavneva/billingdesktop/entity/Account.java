@@ -9,6 +9,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class Account {
 
-    private Integer moneyId;
+    private Integer accountId;
     private BigDecimal amount;
 }

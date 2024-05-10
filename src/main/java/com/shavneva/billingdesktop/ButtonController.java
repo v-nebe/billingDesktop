@@ -1,5 +1,7 @@
 package com.shavneva.billingdesktop;
 
+import com.shavneva.billingdesktop.entity.Role;
+import com.shavneva.billingdesktop.entity.User;
 import com.shavneva.billingdesktop.service.ApiService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -14,7 +16,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Optional;
 
 public class ButtonController {
@@ -87,11 +88,20 @@ public class ButtonController {
         // Отправить запрос аутентификации через сервис
         ApiService.authenticateUser(userName, password, isAuthenticated -> {
             if (isAuthenticated) {
-                Platform.runLater(() -> openUserWindow(event));
+                Role role = ApiService.getRoleName();
+                Platform.runLater(() ->  openAdminWindow(event));
             } else {
                 Platform.runLater(() -> ErrorDialog.showError("Ошибка аутентификации"));
             }
         });
+    }
+    private void openWindowForRole(Role role, ActionEvent event) {
+        /*if (role == Role.ADMIN) {
+            openAdminWindow(event);
+        } else {
+            openUserWindow(event);
+        }*/
+
     }
 
     private void openUserWindow(ActionEvent event) {
@@ -103,6 +113,31 @@ public class ButtonController {
             // Загрузить FXML-файл окна пользователя
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getResource("userwindow-view.fxml"));
+
+            // Создать сцену и установить ее в новое окно
+            Scene scene = new Scene(fxmlLoader.load());
+            Stage newStage = new Stage();
+            newStage.setTitle("Биллинговая система");
+            newStage.getIcons().add(icon);
+            newStage.setScene(scene);
+
+            // Показать новое окно пользователя
+            newStage.show();
+        } catch (IOException e) {
+            // Показать сообщение об ошибке при загрузке FXML-файла
+            ErrorDialog.showError("Произошла ошибка: " + e.getMessage());
+        }
+    }
+
+    private void openAdminWindow(ActionEvent event) {
+        try {
+            // Скрыть текущее окно
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.hide();
+
+            // Загрузить FXML-файл окна пользователя
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("admin-view.fxml"));
 
             // Создать сцену и установить ее в новое окно
             Scene scene = new Scene(fxmlLoader.load());
@@ -183,15 +218,5 @@ public class ButtonController {
         alert.showAndWait();
     }
 
-    public void showTable(ActionEvent event) {
-        TableView<String> table = new TableView<>();
 
-        BorderPane root = new BorderPane();
-        root.setCenter(table);
-        Scene scene = new Scene(root, 800, 600);
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.setTitle("Таблица");
-        stage.show();
-    }
 }

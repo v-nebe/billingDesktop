@@ -1,10 +1,8 @@
 package com.shavneva.billingdesktop.repository.factory;
 
-import com.shavneva.billingdesktop.entity.User;
-import com.shavneva.billingdesktop.repository.AddAuthHeadersRequestFilter;
-import com.shavneva.billingdesktop.repository.IServerApplicationCrud;
-import com.shavneva.billingdesktop.repository.CrudRepository;
-import com.shavneva.billingdesktop.repository.IUserCrud;
+import com.shavneva.billingdesktop.entity.*;
+import com.shavneva.billingdesktop.repository.*;
+import com.shavneva.billingdesktop.repository.interfaces.*;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 
@@ -19,4 +17,35 @@ public class CrudFactory {
         return new CrudRepository<>(client, proxy);
     }
 
+    public static CrudRepository<Tariff> createTariffRepository() {
+        ResteasyClient client = (ResteasyClient) ResteasyClientBuilder.newClient();
+        client.register(AddAuthHeadersRequestFilter.class);
+        IServerApplicationCrud<Tariff> proxy = client.target(BASE_URL + "/tariffs" )
+                .proxy(ITariffCrud.class);
+        return new CrudRepository<>(client, proxy);
+    }
+
+    public static CrudRepository<Services> createServicesRepository() {
+        ResteasyClient client = (ResteasyClient) ResteasyClientBuilder.newClient();
+        client.register(AddAuthHeadersRequestFilter.class);
+        IServerApplicationCrud<Services> proxy = client.target(BASE_URL + "/services" )
+                .proxy(IServicesCrud.class);
+        return new CrudRepository<>(client, proxy);
+    }
+
+    public static CrudRepository<Role> createRoleRepository() {
+        ResteasyClient client = (ResteasyClient) ResteasyClientBuilder.newClient();
+        client.register(AddAuthHeadersRequestFilter.class);
+        IServerApplicationCrud<Role> proxy = client.target(BASE_URL + "/roles" )
+                .proxy(IRoleCrud.class);
+        return new CrudRepository<>(client, proxy);
+    }
+
+    public static CrudRepository<Account> createAccountRepository() {
+        ResteasyClient client = (ResteasyClient) ResteasyClientBuilder.newClient();
+        client.register(AddAuthHeadersRequestFilter.class);
+        IServerApplicationCrud<Account> proxy = client.target(BASE_URL + "/accounts" )
+                .proxy(IAccountCrud.class);
+        return new CrudRepository<>(client, proxy);
+    }
 }

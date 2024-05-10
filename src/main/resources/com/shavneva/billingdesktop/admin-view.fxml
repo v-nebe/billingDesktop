@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shavneva.billingdesktop.ButtonController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shavneva.billingdesktop.DataBaseLoader">
    <children>
       <BorderPane prefHeight="400.0" prefWidth="600.0">
          <top>
@@ -13,22 +13,27 @@
               <menus>
                 <Menu mnemonicParsing="false" text="Пользователи">
                   <items>
-                    <MenuItem mnemonicParsing="false" onAction="#showTable" text="Показать" />
+                    <MenuItem mnemonicParsing="false" onAction="#showTableUser" text="Показать" />
                   </items>
                 </Menu>
+                  <Menu mnemonicParsing="false" text="Роли">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#showTableRoles" text="Показать" />
+                    </items>
+                  </Menu>
                 <Menu mnemonicParsing="false" text="Тарифы">
                   <items>
-                    <MenuItem mnemonicParsing="false" onAction="#showTable" text="Показать" />
+                    <MenuItem mnemonicParsing="false" onAction="#showTableTariffs" text="Показать" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Услуги">
                   <items>
-                    <MenuItem mnemonicParsing="false" onAction="#showTable" text="Показать" />
+                    <MenuItem mnemonicParsing="false" onAction="#showTableServices" text="Показать" />
                   </items>
                 </Menu>
                   <Menu mnemonicParsing="false" text="Счета">
                     <items>
-                      <MenuItem mnemonicParsing="false" onAction="#showTable" text="Показать" />
+                      <MenuItem mnemonicParsing="false" onAction="#showTableAccount" text="Показать" />
                     </items>
                   </Menu>
               </menus>

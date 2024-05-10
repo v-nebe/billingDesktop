@@ -1,4 +1,4 @@
-package com.shavneva.billingdesktop.repository;
+package com.shavneva.billingdesktop.repository.interfaces;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

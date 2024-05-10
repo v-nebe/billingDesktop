@@ -20,4 +20,5 @@ module com.shavneva.billingdesktop {
     exports com.shavneva.billingdesktop.entity;
     exports com.shavneva.billingdesktop.service;
     exports com.shavneva.billingdesktop.repository;
+    exports com.shavneva.billingdesktop.repository.interfaces;
 }
