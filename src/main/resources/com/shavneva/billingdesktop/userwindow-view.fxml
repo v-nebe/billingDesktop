@@ -3,8 +3,9 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="362.0" prefWidth="454.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shavneva.billingdesktop.ButtonController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="328.0" prefWidth="454.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shavneva.billingdesktop.ButtonController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -26,7 +27,7 @@
       </MenuBar>
    </top>
    <center>
-      <GridPane prefHeight="373.0" prefWidth="379.0" BorderPane.alignment="CENTER">
+      <GridPane prefHeight="279.0" prefWidth="454.0" BorderPane.alignment="CENTER">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -41,25 +42,47 @@
             <Label contentDisplay="CENTER" text="Баланс на сегодня:">
                <GridPane.margin>
                   <Insets left="10.0" />
-               </GridPane.margin></Label>
+               </GridPane.margin>
+               <font>
+                  <Font size="20.0" />
+               </font></Label>
             <Label text="0.0" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                <GridPane.margin>
                   <Insets />
-               </GridPane.margin></Label>
+               </GridPane.margin>
+               <font>
+                  <Font size="20.0" />
+               </font></Label>
             <Label text="Тарифный план" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets left="10.0" />
-               </GridPane.margin></Label>
+               </GridPane.margin>
+               <font>
+                  <Font size="20.0" />
+               </font></Label>
             <Label text="name" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets />
                </GridPane.margin>
+               <font>
+                  <Font size="20.0" />
+               </font>
             </Label>
-            <Label text="Другие тарифные планы и услуги" GridPane.halignment="LEFT" GridPane.rowIndex="2">
+            <Label prefHeight="34.0" prefWidth="217.0" text="Другие тарифные планы" GridPane.halignment="LEFT" GridPane.rowIndex="2">
                <GridPane.margin>
                   <Insets left="10.0" />
-               </GridPane.margin></Label>
-            <Button mnemonicParsing="false" onAction="#openWindowAboutTariffs" text="Ознакомиться" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+               </GridPane.margin>
+               <font>
+                  <Font size="18.0" />
+               </font></Label>
+            <Button mnemonicParsing="false" onAction="#openWindowAboutTariffs" prefHeight="36.0" prefWidth="215.0" text="Ознакомиться" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+               <font>
+                  <Font size="20.0" />
+               </font></Button>
+            <Button mnemonicParsing="false" onAction="#openDepositMoneyWindow" prefHeight="38.0" prefWidth="215.0" text="Пополнить счет" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+               <font>
+                  <Font size="20.0" />
+               </font></Button>
          </children>
       </GridPane>
    </center>

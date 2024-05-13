@@ -2,6 +2,7 @@ package com.shavneva.billingdesktop;
 
 import com.shavneva.billingdesktop.entity.Role;
 import com.shavneva.billingdesktop.entity.User;
+import com.shavneva.billingdesktop.entity.InfoContext;
 import com.shavneva.billingdesktop.service.ApiService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -11,14 +12,16 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public class ButtonController {
+
+    private User currentUser;
     @FXML
     private TextField login;
     @FXML
@@ -37,6 +40,8 @@ public class ButtonController {
     private CheckBox smsCheckBox;
     @FXML
     private CheckBox emailCheckBox;
+    @FXML
+    private TextField amountField;
     Image icon = new Image(LoginApplication.class.getResourceAsStream("/com/shavneva/billingdesktop/images/icon.png"));
 
     @FXML
@@ -88,8 +93,13 @@ public class ButtonController {
         // Отправить запрос аутентификации через сервис
         ApiService.authenticateUser(userName, password, isAuthenticated -> {
             if (isAuthenticated) {
-                Role role = ApiService.getRoleName();
-                Platform.runLater(() ->  openAdminWindow(event));
+                ApiService.getUserInfo(userName, user -> {
+                    InfoContext.setCurrentUser(user);
+                    Role role = ApiService.getRoleName();
+                    InfoContext.setRole(role);
+
+                    Platform.runLater(() -> openUserWindow(event));
+                });
             } else {
                 Platform.runLater(() -> ErrorDialog.showError("Ошибка аутентификации"));
             }
@@ -131,35 +141,72 @@ public class ButtonController {
 
     private void openAdminWindow(ActionEvent event) {
         try {
-            // Скрыть текущее окно
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.hide();
 
-            // Загрузить FXML-файл окна пользователя
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getResource("admin-view.fxml"));
 
-            // Создать сцену и установить ее в новое окно
             Scene scene = new Scene(fxmlLoader.load());
             Stage newStage = new Stage();
             newStage.setTitle("Биллинговая система");
             newStage.getIcons().add(icon);
             newStage.setScene(scene);
 
-            // Показать новое окно пользователя
             newStage.show();
         } catch (IOException e) {
-            // Показать сообщение об ошибке при загрузке FXML-файла
+
             ErrorDialog.showError("Произошла ошибка: " + e.getMessage());
         }
     }
 
+    @FXML
+    private void openDepositMoneyWindow(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource("depositMoney-view.fxml"));
+
+            Scene scene = new Scene(fxmlLoader.load());
+            Stage newStage = new Stage();
+            newStage.setTitle("Пополнить счёт");
+            newStage.getIcons().add(icon);
+            newStage.setScene(scene);
+            newStage.show();
+
+        } catch (IOException e) {
+            ErrorDialog.showError("Произошла ошибка: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    protected void handleDepositButtonClick(ActionEvent event) {
+
+        String amountText = amountField.getText();
+        BigDecimal amount = new BigDecimal(amountText);
+        User currentUser = InfoContext.getCurrentUser();
+
+        ApiService.depositMoney(currentUser.getEmail(), amount);
+
+        amountField.getScene().getWindow().hide();
+    }
+
     public void handleAboutMenuItem(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Об аккаунте");
-        alert.setHeaderText(null);
-        alert.setContentText("Информация о вашем аккаунте");
-        alert.showAndWait();
+        User currentUser = InfoContext.getCurrentUser();
+        if (currentUser != null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Об аккаунте");
+            alert.setHeaderText(null);
+            alert.setContentText("Информация о вашем аккаунте\n\n" +
+                    "Имя: " + currentUser.getFirstName() + "\n" +
+                    "Фамилия: " + currentUser.getLastName() + "\n" +
+                    "Почта: " + currentUser.getEmail() + "\n" +
+                    "Номер телефона: " + currentUser.getNumber()
+            );
+            alert.showAndWait();
+        } else {
+            // Отобразить сообщение об ошибке, если currentUser или role равны null
+            ErrorDialog.showError("Информация о пользователе недоступна");
+        }
     }
 
     public void handleAboutExit(ActionEvent event) {
@@ -191,12 +238,11 @@ public class ButtonController {
     public void openHelpMenuItem(ActionEvent event) {
         String helpContent = "Руководство пользователя для приложения управления биллинговой системой\n\n" +
                 "1. Вкладка 'Профиль':\n" +
-                "   - Во вкладке 'Профиль' вы можете просмотреть и отредактировать информацию о своем профиле\n" +
-                "   - Информация о профиле может включать личные данные, такие как имя, фамилия, email и номер телефона\n" +
-                "   - Для сохранения изменений нажмите кнопку 'Сохранить'\n" +
+                "   - Во вкладке 'Профиль' вы можете просмотреть информацию о своем профиле\n" +
+                "   - Информация о профиле включает личные данные, такие как имя, фамилия, email и номер телефона\n" +
                 "2. Настройки уведомлений:\n" +
                 "   - Для настройки уведомлений выберите соответствующие опции в окне 'Настройки'\n" +
-                "   - Опции могут включать выбор типа уведомлений (SMS, email и т. д.) и настройки частоты получения уведомлений\n" +
+                "   - Опции включают выбор типа уведомлений: SM или email\n" +
                 "3. Просмотр тарифов:\n" +
                 "   - Для просмотра доступных тарифов нажмите кнопку 'Тарифы'\n" +
                 "   - В открывшемся окне отобразится список доступных тарифов\n" +

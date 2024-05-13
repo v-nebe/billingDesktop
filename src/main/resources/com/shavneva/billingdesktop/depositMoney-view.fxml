@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="141.0" prefWidth="292.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shavneva.billingdesktop.ButtonController">
+   <BorderPane prefHeight="134.0" prefWidth="298.0">
+      <top>
+           <Label prefHeight="41.0" prefWidth="262.0" text="Введите сумму для пополнения счета" BorderPane.alignment="CENTER">
+            <font>
+               <Font size="15.0" />
+            </font></Label>
+      </top>
+      <center>
+      
+                 <HBox prefHeight="129.0" prefWidth="296.0" spacing="10" BorderPane.alignment="CENTER">
+               <Label prefHeight="30.0" prefWidth="74.0" text="Сумма:" textAlignment="RIGHT">
+               <font>
+                  <Font size="20.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin></Label>
+               <TextField fx:id="amountField" prefHeight="29.0" prefWidth="181.0">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </TextField>
+           </HBox>
+      </center>
+      <bottom>
+   
+              <Button onAction="#handleDepositButtonClick" prefHeight="36.0" prefWidth="120.0" text="Пополнить" BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+               <Insets bottom="10.0" />
+            </BorderPane.margin>
+            <font>
+               <Font size="15.0" />
+            </font></Button>
+      </bottom>
+   </BorderPane>
+</AnchorPane>
