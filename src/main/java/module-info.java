@@ -13,7 +13,8 @@ module com.shavneva.billingdesktop {
     requires static lombok;
     requires java.ws.rs;
     requires resteasy.client.api;
-    requires com.fasterxml.jackson.annotation;
+    requires com.google.gson;
+    requires com.fasterxml.jackson.databind;
 
     opens com.shavneva.billingdesktop to javafx.fxml;
     exports com.shavneva.billingdesktop;
@@ -21,4 +22,6 @@ module com.shavneva.billingdesktop {
     exports com.shavneva.billingdesktop.service;
     exports com.shavneva.billingdesktop.repository;
     exports com.shavneva.billingdesktop.repository.interfaces;
+    exports com.shavneva.billingdesktop.dialog;
+    opens com.shavneva.billingdesktop.dialog to javafx.fxml;
 }

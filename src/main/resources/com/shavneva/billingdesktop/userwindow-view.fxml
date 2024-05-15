@@ -46,7 +46,7 @@
                <font>
                   <Font size="20.0" />
                </font></Label>
-            <Label text="0.0" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+            <Label fx:id="usersAmount" text="0.0" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                <GridPane.margin>
                   <Insets />
                </GridPane.margin>
@@ -60,7 +60,7 @@
                <font>
                   <Font size="20.0" />
                </font></Label>
-            <Label text="name" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+            <Label fx:id="usersTariff" text="name" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets />
                </GridPane.margin>

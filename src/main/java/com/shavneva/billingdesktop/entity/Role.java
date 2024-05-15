@@ -12,4 +12,7 @@ import lombok.NoArgsConstructor;
 public class Role {
     private Long roleId;
     private String roleName;
+
+    public static final Role ADMIN = Role.builder().roleId(1L).roleName("ROLE_ADMIN").build();
+    public static final Role USER = Role.builder().roleId(2L).roleName("ROLE_USER").build();
 }

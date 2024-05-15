@@ -1,13 +1,13 @@
 package com.shavneva.billingdesktop;
 
-import com.shavneva.billingdesktop.entity.Role;
-import com.shavneva.billingdesktop.entity.User;
-import com.shavneva.billingdesktop.entity.InfoContext;
+import com.shavneva.billingdesktop.dialog.ErrorDialog;
+import com.shavneva.billingdesktop.entity.*;
 import com.shavneva.billingdesktop.service.ApiService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -52,7 +52,7 @@ public class ButtonController {
 
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("registration-view.fxml"));
 
-                Scene scene = new Scene(fxmlLoader.load(), 400, 290);
+                Scene scene = new Scene(fxmlLoader.load());
                 Stage newStage = new Stage();
                 newStage.hide();
                 newStage.setTitle("Окно регистрации");
@@ -90,15 +90,15 @@ public class ButtonController {
         String userName = login.getText();
         String password = passwordField.getText();
 
-        // Отправить запрос аутентификации через сервис
         ApiService.authenticateUser(userName, password, isAuthenticated -> {
             if (isAuthenticated) {
                 ApiService.getUserInfo(userName, user -> {
                     InfoContext.setCurrentUser(user);
-                    Role role = ApiService.getRoleName();
-                    InfoContext.setRole(role);
 
-                    Platform.runLater(() -> openUserWindow(event));
+                    ApiService.getCurrentUserRole(role -> {
+                        InfoContext.setRole(role);
+                        Platform.runLater(() -> openWindowForRole(role, event));
+                    });
                 });
             } else {
                 Platform.runLater(() -> ErrorDialog.showError("Ошибка аутентификации"));
@@ -106,17 +106,15 @@ public class ButtonController {
         });
     }
     private void openWindowForRole(Role role, ActionEvent event) {
-        /*if (role == Role.ADMIN) {
+        if (role == Role.ADMIN) {
             openAdminWindow(event);
         } else {
             openUserWindow(event);
-        }*/
-
+        }
     }
 
     private void openUserWindow(ActionEvent event) {
         try {
-            // Скрыть текущее окно
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.hide();
 
@@ -223,16 +221,34 @@ public class ButtonController {
 
     public void openSettingsMenuItem(ActionEvent event) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Настройки");
+        alert.setTitle("Настройки уведомлений");
         alert.setHeaderText(null);
 
-        smsCheckBox = new CheckBox("SMS уведомления");
-        emailCheckBox = new CheckBox("Email уведомления");
-        smsCheckBox.setSelected(false);
-        emailCheckBox.setSelected(false);
-        alert.getDialogPane().setContent(new VBox(smsCheckBox, emailCheckBox));
+        RadioButton smsRadioButton = new RadioButton("SMS уведомления");
+        RadioButton emailRadioButton = new RadioButton("Email уведомления");
+        emailRadioButton.setSelected(true);
 
-        alert.showAndWait();
+        ToggleGroup toggleGroup = new ToggleGroup();
+        smsRadioButton.setToggleGroup(toggleGroup);
+        emailRadioButton.setToggleGroup(toggleGroup);
+
+        VBox vbox = new VBox(10);
+        vbox.getChildren().addAll(smsRadioButton, emailRadioButton);
+        vbox.setPadding(new Insets(20));
+
+        alert.getDialogPane().setContent(vbox);
+
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(okButton, cancelButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == okButton) {
+            boolean smsNotifications = smsRadioButton.isSelected();
+            boolean emailNotifications = emailRadioButton.isSelected();
+
+            ApiService.saveNotificationSettings(smsNotifications, emailNotifications);
+        }
     }
 
     public void openHelpMenuItem(ActionEvent event) {
@@ -257,11 +273,32 @@ public class ButtonController {
     }
 
     public void openWindowAboutTariffs(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Тарифы");
-        alert.setHeaderText(null);
-        alert.setContentText("Список тарифов:");
-        alert.showAndWait();
+        ApiService.getTariffWithServices(tariffs -> {
+            Platform.runLater(() -> {
+                if (tariffs != null && !tariffs.isEmpty()) {
+                    StringBuilder tariffsInfo = new StringBuilder();
+                    for (Tariff tariff : tariffs) {
+                        tariffsInfo.append("Название тарифа: ").append(tariff.getTariffName()).append("\n")
+                                .append("Цена: ").append(tariff.getPrice()).append("\n")
+                                .append("Входящие услуги:\n");
+
+                        for (Services service : tariff.getServices()) {
+                            tariffsInfo.append("- ").append(service.getService()).append("\n");
+                        }
+                        tariffsInfo.append("\n");
+                    }
+
+                    // Отобразить информацию о тарифах в диалоговом окне
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("О тарифах");
+                    alert.setHeaderText(null);
+                    alert.setContentText(tariffsInfo.toString());
+                    alert.showAndWait();
+                } else {
+                    ErrorDialog.showError("Информация о тарифах недоступна");
+                }
+            });
+        });
     }
 
 

@@ -4,8 +4,6 @@ public class InfoContext {
     private static User currentUser;
     private static Role role;
 
-    private static Tariff tariffs;
-
     public static User getCurrentUser() {
         return currentUser;
     }
@@ -22,11 +20,4 @@ public class InfoContext {
         role = userRole;
     }
 
-    public static Tariff getTariffs() {
-        return tariffs;
-    }
-
-    public static void setTariffs(Tariff tariffs) {
-        InfoContext.tariffs = tariffs;
-    }
 }
