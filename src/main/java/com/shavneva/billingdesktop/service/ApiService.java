@@ -1,6 +1,7 @@
 package com.shavneva.billingdesktop.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.shavneva.billingdesktop.entity.Role;
@@ -13,16 +14,15 @@ import com.shavneva.billingdesktop.repository.factory.CrudFactory;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import com.google.gson.JsonObject;
-
-import javax.ws.rs.core.Response;
-
 
 public class ApiService {
     public static final String BASE_URL = "http://localhost:8080/api";
@@ -43,22 +43,11 @@ public class ApiService {
 
     }
 
-    public static void getUserInfo(String userName, Consumer<User> callback) {
-        CrudRepository<User> userCrudRepository = CrudFactory.createUserRepository();
-        List<User> users = userCrudRepository.getAll();
-        for (User user : users) {
-            if (user.getEmail().equals(userName)) {
-                callback.accept(user);
-                return;
-            }
-        }
-        callback.accept(null);
-    }
-
     public static void registerUser(String firstName, String lastName, String email, String phoneNumber,
                                     String password, Consumer<Boolean> callback) {
 
-        User user = new User(null, firstName, lastName, email, phoneNumber, password, null, null);
+        User user = new User(null, firstName, lastName, email, phoneNumber, password, null, null,
+                null, null);
         CrudRepository<User> userRepository = CrudFactory.createUserRepository();
         userRepository.create(user);
         callback.accept(true);
@@ -66,7 +55,7 @@ public class ApiService {
 
 
     public static void getAllUserInfo(Consumer<List<User>> callback) {
-        String url = BASE_URL + "/user/users-with-tariffs-and-services";
+        String url = BASE_URL + "/user/all-info-user";
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -78,6 +67,7 @@ public class ApiService {
                 .thenAccept(responseBody -> {
                     try {
                         ObjectMapper objectMapper = new ObjectMapper();
+                        objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
                         List<User> users = objectMapper.readValue(responseBody, new TypeReference<List<User>>() {});
                         callback.accept(users);
                     } catch (IOException e) {
@@ -91,35 +81,6 @@ public class ApiService {
                     return null;
                 });
     }
-
-
-    public static void getCurrentUserRole(Consumer<Role> callback) {
-        String url = BASE_URL + "user/user-role";
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .build();
-
-        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> {
-                    if (response.statusCode() == 200) {
-                        // Если запрос успешен, преобразуем JSON-ответ в объект Role
-                        Gson gson = new Gson();
-                        Role role = gson.fromJson(response.body(), Role.class);
-                        return role;
-                    } else {
-                        // Если произошла ошибка, возвращаем null
-                        return null;
-                    }
-                })
-                .thenAccept(callback)
-                .exceptionally(e -> {
-                    System.err.println("Error occurred: " + e);
-                    return null;
-                });
-    }
-
 
     public static void getTariffWithServices(Consumer<List<Tariff>> callback) {
         String url = BASE_URL + "/tariffs/tariffs-with-services";
@@ -176,30 +137,43 @@ public class ApiService {
         }
     }
 
-    public static void saveNotificationSettings(boolean smsNotifications, boolean emailNotifications) {
-        String url = BASE_URL + "/notifications/settings";
-
-        JsonObject requestBody = new JsonObject();
-        requestBody.addProperty("smsNotifications", smsNotifications);
-        requestBody.addProperty("emailNotifications", emailNotifications);
+    public static void getNotificationType(String userEmail, Consumer<String> callback) {
+        String url = BASE_URL + "/notification/get_type?userEmail=" + URLEncoder.encode(userEmail, StandardCharsets.UTF_8);
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+                .build();
+
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenAccept(callback)
+                .exceptionally(e -> {
+                    System.err.println("Error occurred: " + e);
+                    return null;
+                });
+    }
+
+    // Метод для сохранения нового типа уведомлений
+    public static void saveNotificationType(String userEmail, String newNotificationType, Runnable callback) {
+        String url = BASE_URL + "/notification/save_type?userEmail=" + URLEncoder.encode(userEmail, StandardCharsets.UTF_8);
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .POST(HttpRequest.BodyPublishers.ofString(newNotificationType))
                 .build();
 
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200) {
-                        System.out.println("Настройки уведомлений успешно сохранены на сервере.");
+                        callback.run();
                     } else {
-                        System.out.println("Ошибка при сохранении настроек уведомлений на сервере: " + response.statusCode());
+                        System.err.println("Error: " + response.statusCode());
                     }
                 })
                 .exceptionally(e -> {
-                    System.err.println("Ошибка при отправке запроса на сервер: " + e.getMessage());
+                    System.err.println("Error occurred: " + e);
                     return null;
                 });
     }

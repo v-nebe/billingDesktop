@@ -1,23 +1,20 @@
 package com.shavneva.billingdesktop.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class InfoContext {
+    @Setter
+    @Getter
     private static User currentUser;
+    @Setter
+    @Getter
     private static Role role;
-
-    public static User getCurrentUser() {
-        return currentUser;
-    }
-
-    public static void setCurrentUser(User user) {
-        currentUser = user;
-    }
-
-    public static Role getRole() {
-        return role;
-    }
-
-    public static void setRole(Role userRole) {
-        role = userRole;
-    }
+    @Setter
+    @Getter
+    private  static Tariff tariff;
+    @Setter
+    @Getter
+    private static Account amount;
 
 }

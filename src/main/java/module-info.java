@@ -15,6 +15,7 @@ module com.shavneva.billingdesktop {
     requires resteasy.client.api;
     requires com.google.gson;
     requires com.fasterxml.jackson.databind;
+    requires org.apache.poi.ooxml;
 
     opens com.shavneva.billingdesktop to javafx.fxml;
     exports com.shavneva.billingdesktop;
@@ -24,4 +25,5 @@ module com.shavneva.billingdesktop {
     exports com.shavneva.billingdesktop.repository.interfaces;
     exports com.shavneva.billingdesktop.dialog;
     opens com.shavneva.billingdesktop.dialog to javafx.fxml;
+    opens com.shavneva.billingdesktop.entity to com.google.gson;
 }

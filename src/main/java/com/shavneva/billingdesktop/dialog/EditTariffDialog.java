@@ -7,15 +7,11 @@ import javafx.scene.layout.GridPane;
 import java.math.BigDecimal;
 
 public class EditTariffDialog extends Dialog<Boolean> {
-    private TextField tariffIdField;
     private TextField tariffNameField;
     private TextField priceField;
 
     public EditTariffDialog(Tariff tariff) {
         setTitle("Редактировать тариф");
-
-        tariffIdField = new TextField(String.valueOf(tariff.getTariffId()));
-        tariffIdField.setEditable(false);
 
         tariffNameField = new TextField(tariff.getTariffName());
         tariffNameField.setPromptText("Название тарифа");
@@ -24,12 +20,10 @@ public class EditTariffDialog extends Dialog<Boolean> {
         priceField.setPromptText("Цена");
 
         GridPane grid = new GridPane();
-        grid.add(new Label("ID:"), 0, 0);
-        grid.add(tariffIdField, 1, 0);
-        grid.add(new Label("Название:"), 0, 1);
-        grid.add(tariffNameField, 1, 1);
-        grid.add(new Label("Цена:"), 0, 2);
-        grid.add(priceField, 1, 2);
+        grid.add(new Label("Название:"), 0, 0);
+        grid.add(tariffNameField, 1, 0);
+        grid.add(new Label("Цена:"), 0, 1);
+        grid.add(priceField, 1, 1);
 
         getDialogPane().setContent(grid);
 

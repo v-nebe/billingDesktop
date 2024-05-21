@@ -4,6 +4,9 @@ import com.shavneva.billingdesktop.dialog.*;
 import com.shavneva.billingdesktop.entity.*;
 import com.shavneva.billingdesktop.repository.CrudRepository;
 import com.shavneva.billingdesktop.repository.factory.CrudFactory;
+import com.shavneva.billingdesktop.service.ApiService;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -16,65 +19,93 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import org.apache.poi.xwpf.usermodel.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class DataBaseLoader {
     public void showTableUser(ActionEvent event) {
         TableView<User> table = new TableView<>();
 
-        TableColumn<User, String> userIdColumn = new TableColumn<>("User Id");
-        userIdColumn.setCellValueFactory(new PropertyValueFactory<>("userId"));
-
-        TableColumn<User, String> firstNameColumn = new TableColumn<>("First Name");
+        TableColumn<User, String> firstNameColumn = new TableColumn<>("Имя");
         firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
 
-        TableColumn<User, String> lastNameColumn = new TableColumn<>("Last Name");
+        TableColumn<User, String> lastNameColumn = new TableColumn<>("Фамилия");
         lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("lastName"));
 
-        TableColumn<User, String> emailColumn = new TableColumn<>("Email");
+        TableColumn<User, String> emailColumn = new TableColumn<>("Почта");
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
 
-        TableColumn<User, String> numberColumn = new TableColumn<>("Phone Number");
+        TableColumn<User, String> numberColumn = new TableColumn<>("Номер телефона");
         numberColumn.setCellValueFactory(new PropertyValueFactory<>("number"));
 
-        TableColumn<User, String> passwordColumn = new TableColumn<>("Password");
+        TableColumn<User, String> passwordColumn = new TableColumn<>("Пароль");
         passwordColumn.setCellValueFactory(new PropertyValueFactory<>("password"));
 
-        TableColumn<User, Integer> tariffIdColumn = new TableColumn<>("Tariff Id");
-        tariffIdColumn.setCellValueFactory(new PropertyValueFactory<>("tariffId"));
+        ApiService.getAllUserInfo(users -> {
+            Platform.runLater(() -> {
+                ObservableList<User> userObservableList = FXCollections.observableArrayList(users);
+                table.setItems(userObservableList);
+            });
+        });
 
-        TableColumn<User, Integer> accountIdColumn = new TableColumn<>("Account Id");
-        accountIdColumn.setCellValueFactory(new PropertyValueFactory<>("accountId"));
+        TableColumn<User, String> tariffColumn = new TableColumn<>("Тариф");
+        tariffColumn.setCellValueFactory(data -> {
+            User user = data.getValue();
+            if (user.getTariff() != null) {
+                return new SimpleStringProperty(user.getTariff().getTariffName());
+            } else {
+                return new SimpleStringProperty("Не указан");
+            }
+        });
 
+        TableColumn<User, String> accountColumn = new TableColumn<>("Счет");
+        accountColumn.setCellValueFactory(data -> {
+            User user = data.getValue();
+            if (user.getAccount() != null) {
+                return new SimpleStringProperty(String.valueOf(user.getAccount().getAmount()));
+            } else {
+                return new SimpleStringProperty("Не указан");
+            }
+        });
 
-        table.getColumns().addAll(userIdColumn,firstNameColumn, lastNameColumn, emailColumn, numberColumn, passwordColumn,
-                tariffIdColumn, accountIdColumn);
+        TableColumn<User, String> roleColumn = new TableColumn<>("Роль");
+        roleColumn.setCellValueFactory(data -> {
+            User user = data.getValue();
+            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                String roles = user.getRoles().stream()
+                        .map(Role::getRoleName)
+                        .collect(Collectors.joining(", "));
+                return new SimpleStringProperty(roles);
+            } else {
+                return new SimpleStringProperty("Не указан");
+            }
+        });
 
-
-        CrudRepository<User> userCrudRepository = CrudFactory.createUserRepository();
-        List<User> userList = userCrudRepository.getAll();
-
-        ObservableList<User> userObservableList = FXCollections.observableArrayList(userList);
-        table.setItems(userObservableList);
-
+        // Добавление столбцов в таблицу
+        table.getColumns().addAll(firstNameColumn, lastNameColumn, emailColumn, numberColumn, passwordColumn,
+                tariffColumn, accountColumn, roleColumn);
         Button deleteButton = new Button("Удалить");
-        deleteButton.setOnAction(e -> deleteUser(table)); // Обработчик события для кнопки удаления
 
+        deleteButton.setOnAction(e -> deleteUser(table));
         Button editButton = new Button("Редактировать");
-        editButton.setOnAction(e -> editUser(table)); // Обработчик события для кнопки редактирования
+        editButton.setOnAction(e -> editUser(table));
 
-        // Создание панели для кнопок
-        HBox buttonBox = new HBox(10); // Пространство между кнопками
-        buttonBox.setPadding(new Insets(10)); // Отступы от краев
+
+        HBox buttonBox = new HBox(10);
+        buttonBox.setPadding(new Insets(10));
         buttonBox.getChildren().addAll(deleteButton, editButton);
 
-        // Добавление панели с кнопками в верхнюю часть BorderPane
         BorderPane root = new BorderPane();
-        root.setTop(buttonBox); // Панель с кнопками
+        root.setTop(buttonBox);
         root.setCenter(table);
 
         Scene scene = new Scene(root, 800, 600);
@@ -128,13 +159,10 @@ public class DataBaseLoader {
     public void showTableRoles(ActionEvent event) {
         TableView<Role> table = new TableView<>();
 
-        TableColumn<Role, String> roleIdColumn = new TableColumn<>("Role Id");
-        roleIdColumn.setCellValueFactory(new PropertyValueFactory<>("roleId"));
-
-        TableColumn<Role, String> roleColumn = new TableColumn<>("Role");
+        TableColumn<Role, String> roleColumn = new TableColumn<>("Роль");
         roleColumn.setCellValueFactory(new PropertyValueFactory<>("roleName"));
 
-        table.getColumns().addAll(roleIdColumn, roleColumn);
+        table.getColumns().addAll(roleColumn);
 
         CrudRepository<Role> roleCrudRepository = CrudFactory.createRoleRepository();
         List<Role> roleList = roleCrudRepository.getAll();
@@ -153,17 +181,14 @@ public class DataBaseLoader {
     public void showTableTariffs(ActionEvent event) {
         TableView<Tariff> table = new TableView<>();
 
-        TableColumn<Tariff, String> tariffIdColumn = new TableColumn<>("Tariff Id");
-        tariffIdColumn.setCellValueFactory(new PropertyValueFactory<>("tariffId"));
-
-        TableColumn<Tariff, String> tariffNameColumn = new TableColumn<>("Tariff Name");
+        TableColumn<Tariff, String> tariffNameColumn = new TableColumn<>("Название тарифа");
         tariffNameColumn.setCellValueFactory(new PropertyValueFactory<>("tariffName"));
 
-        TableColumn<Tariff, String> priceColumn = new TableColumn<>("Price");
+        TableColumn<Tariff, String> priceColumn = new TableColumn<>("Цена");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
 
 
-        table.getColumns().addAll(tariffIdColumn, tariffNameColumn, priceColumn);
+        table.getColumns().addAll( tariffNameColumn, priceColumn);
 
 
         CrudRepository<Tariff> tariffCrudRepository = CrudFactory.createTariffRepository();
@@ -192,7 +217,7 @@ public class DataBaseLoader {
         Scene scene = new Scene(root, 800, 600);
         Stage stage = new Stage();
         stage.setScene(scene);
-        stage.setTitle("Таблица Тариффы");
+        stage.setTitle("Таблица Тарифы");
         stage.show();
     }
 
@@ -254,15 +279,10 @@ public class DataBaseLoader {
     public void showTableServices(ActionEvent event) {
         TableView<Services> table = new TableView<>();
 
-        TableColumn<Services, String> serviceIdColumn = new TableColumn<>("Service Id");
-        serviceIdColumn.setCellValueFactory(new PropertyValueFactory<>("serviceId"));
-
-        TableColumn<Services, String> priceColumn = new TableColumn<>("Service");
+        TableColumn<Services, String> priceColumn = new TableColumn<>("Услуги");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("service"));
 
-
-        table.getColumns().addAll(serviceIdColumn, priceColumn);
-
+        table.getColumns().addAll( priceColumn);
 
         CrudRepository<Services> servicesCrudRepository = CrudFactory.createServicesRepository();
         List<Services> servicesList = servicesCrudRepository.getAll();
@@ -357,13 +377,10 @@ public class DataBaseLoader {
     public void showTableAccount(ActionEvent event) {
         TableView<Account> table = new TableView<>();
 
-        TableColumn<Account, String> accountIdColumn = new TableColumn<>("Account Id");
-        accountIdColumn.setCellValueFactory(new PropertyValueFactory<>("accountId"));
-
-        TableColumn<Account, String> amount = new TableColumn<>("Amount");
+        TableColumn<Account, String> amount = new TableColumn<>("Счёт");
         amount.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
-        table.getColumns().addAll(accountIdColumn, amount);
+        table.getColumns().addAll(amount);
 
         CrudRepository<Account> accountCrudRepository = CrudFactory.createAccountRepository();
         List<Account> accountList = accountCrudRepository.getAll();
@@ -421,4 +438,73 @@ public class DataBaseLoader {
         }
     }
 
+    public void generateUserReport(ActionEvent event) {
+        // Вызов метода из ApiService для получения информации о пользователях
+        ApiService.getAllUserInfo(users -> {
+            // Создание нового документа
+            XWPFDocument document = new XWPFDocument();
+
+            // Добавление заголовка
+            XWPFParagraph title = document.createParagraph();
+            title.setAlignment(ParagraphAlignment.CENTER);
+            XWPFRun titleRun = title.createRun();
+            titleRun.setText("Отчет о всех пользователях");
+            titleRun.setBold(true);
+            titleRun.setFontSize(20);
+
+            // Добавление информации о пользователях
+            for (User user : users) {
+                addUserInfo(document, "Имя:", user.getFirstName());
+                addUserInfo(document, "Фамилия:", user.getLastName());
+                addUserInfo(document, "Номер телефона:", user.getNumber());
+
+                Tariff tariff = user.getTariff();
+                if (tariff != null) {
+                    addUserInfo(document, "Тарифный план:", tariff.getTariffName());
+                } else {
+                    addUserInfo(document, "Тарифный план:", "Не указан");
+                }
+
+                Account account = user.getAccount();
+                if (account != null) {
+                    addUserInfo(document, "Баланс:", String.valueOf(account.getAmount()));
+                } else {
+                    addUserInfo(document, "Баланс:", "Не указан");
+                }
+
+                // Добавление пустой строки для разделения пользователей
+                document.createParagraph();
+            }
+
+            // Сохранение файла в отдельном потоке
+            Platform.runLater(() -> {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Сохранить отчет");
+                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Word Documents", "*.docx"));
+                File file = fileChooser.showSaveDialog(new Stage());
+
+                if (file != null) {
+                    try (FileOutputStream out = new FileOutputStream(file)) {
+                        document.write(out);
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Сохранение");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Отчет успешно сохранен.");
+                        alert.showAndWait();
+                    } catch (IOException e) {
+                       ErrorDialog.showError("Ошибка при сохранении отчета");
+                    }
+                }
+            });
+        });
+    }
+
+    private void addUserInfo(XWPFDocument document, String label, String value) {
+        XWPFParagraph paragraph = document.createParagraph();
+        XWPFRun run = paragraph.createRun();
+        run.setText(label + " " + value);
+        run.setFontSize(12);
+    }
 }
+
+

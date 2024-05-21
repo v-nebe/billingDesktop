@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.List;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -20,7 +22,16 @@ public class User {
     private String email;
     private String number;
     private String password;
+    private String notificationType;
 
-    private Integer tariffId;
-    private Integer accountId;
+    private Tariff tariff;
+    private Account account;
+    private List<Role> roles;
+
+    public User(Object id, String firstName, String lastName, String email, String phoneNumber,
+                String password, Object tariff, Object account) {
+    }
+    public User(Object id, String firstName, String lastName, String email, String phoneNumber,
+                String password, Object tariff, Object account, Object role) {
+    }
 }

@@ -7,7 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Services{
-
     private Integer serviceId;
     private String service;
 }

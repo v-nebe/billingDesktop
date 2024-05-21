@@ -7,21 +7,25 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 public class ButtonController {
 
-    private User currentUser;
     @FXML
     private TextField login;
     @FXML
@@ -37,76 +41,132 @@ public class ButtonController {
     @FXML
     private TextField repeatedPassword;
     @FXML
-    private CheckBox smsCheckBox;
-    @FXML
-    private CheckBox emailCheckBox;
-    @FXML
     private TextField amountField;
+    @FXML
+    private Label userAmount;
+    @FXML
     Image icon = new Image(LoginApplication.class.getResourceAsStream("/com/shavneva/billingdesktop/images/icon.png"));
+
+    @FXML
+    private void initialize() {
+        userAmount = new Label("Загрузка...");
+        userAmount.setFont(Font.font(20));
+    }
 
     @FXML
     protected void openRegistrationWindowClick(ActionEvent event) {
         try {
-                Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                currentStage.hide();
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.hide();
 
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("registration-view.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("registration-view.fxml"));
+            Parent root = fxmlLoader.load();
+            Stage newStage = new Stage();
+            newStage.setTitle("Окно регистрации");
+            newStage.getIcons().add(icon);
+            newStage.setScene(new Scene(root));
+            newStage.setResizable(false);
 
-                Scene scene = new Scene(fxmlLoader.load());
-                Stage newStage = new Stage();
-                newStage.hide();
-                newStage.setTitle("Окно регистрации");
-                newStage.getIcons().add(icon);
-                newStage.setScene(scene);
-                newStage.show();
+            newStage.setOnCloseRequest(windowEvent -> {
+                openLoginWindow(event);
+            });
 
-            } catch (IOException e) {
-                ErrorDialog.showError("Произошла ошибка при загрузке FXML: " + e.getMessage());
-            }
+            newStage.show();
+
+        } catch (IOException e) {
+            ErrorDialog.showError("Произошла ошибка при загрузке FXML: " + e.getMessage());
+        }
     }
+
+    private void openLoginWindow(ActionEvent event) {
+        try {
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.hide();
+
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("login-view.fxml"));
+            Parent root = fxmlLoader.load();
+            Stage loginStage = new Stage();
+            loginStage.setTitle("Окно логинации");
+            loginStage.getIcons().add(icon);
+            loginStage.setScene(new Scene(root));
+            loginStage.show();
+        } catch (IOException e) {
+            ErrorDialog.showError("Произошла ошибка при загрузке FXML: " + e.getMessage());
+        }
+    }
+
     @FXML
-    protected void openUWindowClick(ActionEvent event){
-        String firstName = name.getText();
-        String lastName = surname.getText();
-        String registrationEmail = email.getText();
-        String pNumber =  phoneNumber.getText();
-        String password = passwordField.getText();
-        String rPassword = repeatedPassword.getText();
+    protected void openUWindowClick(ActionEvent event) {
+        try {
+            String firstName = name.getText();
+            String lastName = surname.getText();
+            String registrationEmail = email.getText();
+            String pNumber = phoneNumber.getText();
+            String password = passwordField.getText();
+            String rPassword = repeatedPassword.getText();
 
-        ApiService.registerUser(firstName,lastName,registrationEmail,pNumber,password, isRegistered -> {
-            if (isRegistered) {
-                // В случае успешной аутентификации открыть окно пользователя
-                Platform.runLater(() -> openUserWindow(event));
-            } else {
-                // Показать сообщение об ошибке регистрации
-                Platform.runLater(() -> ErrorDialog.showError("Ошибка регистрации"));
+            if (!password.equals(rPassword)) {
+                ErrorDialog.showError("Пароли не совпадают. Перепроверьте ввод");
+                return;
             }
-        });
 
+            ApiService.registerUser(firstName, lastName, registrationEmail, pNumber, password, isRegistered -> {
+                if (isRegistered) {
+                    Platform.runLater(() -> openLoginWindow(event));
+                } else {
+                    Platform.runLater(() -> ErrorDialog.showError("Ошибка регистрации"));
+                }
+            });
+        } catch (Exception e) {
+            ErrorDialog.showError("Введите все данные для регистрации");
+        }
     }
 
     @FXML
     protected void openUserWindowClick(ActionEvent event) {
-        String userName = login.getText();
-        String password = passwordField.getText();
+        try {
+            String userName = login.getText();
+            String password = passwordField.getText();
 
-        ApiService.authenticateUser(userName, password, isAuthenticated -> {
-            if (isAuthenticated) {
-                ApiService.getUserInfo(userName, user -> {
-                    InfoContext.setCurrentUser(user);
+            ApiService.authenticateUser(userName, password, isAuthenticated -> {
+                if (isAuthenticated) {
+                    ApiService.getAllUserInfo(users -> {
+                        User currentUser = findUserByUsername(users, userName);
+                        if (currentUser != null) {
+                            InfoContext.setCurrentUser(currentUser);
 
-                    ApiService.getCurrentUserRole(role -> {
-                        InfoContext.setRole(role);
-                        Platform.runLater(() -> openWindowForRole(role, event));
+                            List<Role> roles = currentUser.getRoles();
+                            if (roles != null && !roles.isEmpty()) {
+                                Role userRole = roles.get(0);
+                                InfoContext.setRole(userRole);
+                                Platform.runLater(() -> openWindowForRole(userRole, event));
+                            } else {
+                                Platform.runLater(() -> ErrorDialog.showError("Роль пользователя не найдена"));
+                            }
+                        } else {
+                            Platform.runLater(() -> ErrorDialog.showError("Ошибка при получении данных пользователя"));
+                        }
                     });
-                });
-            } else {
-                Platform.runLater(() -> ErrorDialog.showError("Ошибка аутентификации"));
-            }
-        });
+                } else {
+                    Platform.runLater(() -> ErrorDialog.showError("Ошибка аутентификации"));
+                }
+            });
+        } catch (Exception e) {
+            ErrorDialog.showError("Введите корректные данные для входа");
+        }
     }
+
+    private User findUserByUsername(List<User> users, String username) {
+        for (User user : users) {
+            if (user.getEmail().equalsIgnoreCase(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
     private void openWindowForRole(Role role, ActionEvent event) {
-        if (role == Role.ADMIN) {
+        if ("ROLE_ADMIN".equals(role.getRoleName())) {
             openAdminWindow(event);
         } else {
             openUserWindow(event);
@@ -118,21 +178,62 @@ public class ButtonController {
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.hide();
 
-            // Загрузить FXML-файл окна пользователя
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getResource("userwindow-view.fxml"));
+            Parent root = fxmlLoader.load();
 
-            // Создать сцену и установить ее в новое окно
-            Scene scene = new Scene(fxmlLoader.load());
+            GridPane gridPane = (GridPane) root.lookup("#gridPane");
+
+            userAmount.setFont(Font.font(20));
+            GridPane.setHalignment(userAmount, HPos.CENTER);
+            GridPane.setConstraints(userAmount, 1, 0);
+            gridPane.getChildren().add(userAmount);
+
+            Label userTariff = new Label("Загрузка...");
+            userTariff.setFont(Font.font(20));
+            GridPane.setHalignment(userTariff, HPos.CENTER);
+            GridPane.setConstraints(userTariff, 1, 1);
+            gridPane.getChildren().add(userTariff);
+
+            Scene scene = new Scene(root);
             Stage newStage = new Stage();
             newStage.setTitle("Биллинговая система");
             newStage.getIcons().add(icon);
+            newStage.setResizable(false);
             newStage.setScene(scene);
 
-            // Показать новое окно пользователя
+            newStage.setOnCloseRequest(windowEvent -> {
+                openLoginWindow(event);
+            });
+
+            ApiService.getAllUserInfo(users -> {
+                User currentUser = InfoContext.getCurrentUser();
+                if (currentUser != null) {
+                    Optional<User> optionalUser = users.stream()
+                            .filter(user -> user.getUserId().equals(currentUser.getUserId()))
+                            .findFirst();
+
+                    if (optionalUser.isPresent()) {
+                        User foundUser = optionalUser.get();
+                        InfoContext.setCurrentUser(foundUser);
+
+                        Tariff tariff = foundUser.getTariff();
+                        Account account = foundUser.getAccount();
+
+                        Platform.runLater(() -> {
+                            userAmount.setText(String.valueOf(account.getAmount()));
+                            userTariff.setText(tariff.getTariffName());
+                            newStage.show();
+                        });
+                    } else {
+                        ErrorDialog.showError("Не удалось найти информацию о текущем пользователе");
+                    }
+                } else {
+                    ErrorDialog.showError("Текущий пользователь не установлен");
+                }
+            });
             newStage.show();
         } catch (IOException e) {
-            // Показать сообщение об ошибке при загрузке FXML-файла
             ErrorDialog.showError("Произошла ошибка: " + e.getMessage());
         }
     }
@@ -149,11 +250,15 @@ public class ButtonController {
             Stage newStage = new Stage();
             newStage.setTitle("Биллинговая система");
             newStage.getIcons().add(icon);
+            newStage.setResizable(false);
             newStage.setScene(scene);
+
+            newStage.setOnCloseRequest(windowEvent -> {
+                openLoginWindow(event);
+            });
 
             newStage.show();
         } catch (IOException e) {
-
             ErrorDialog.showError("Произошла ошибка: " + e.getMessage());
         }
     }
@@ -161,6 +266,7 @@ public class ButtonController {
     @FXML
     private void openDepositMoneyWindow(ActionEvent event) {
         try {
+
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getResource("depositMoney-view.fxml"));
 
@@ -169,7 +275,15 @@ public class ButtonController {
             newStage.setTitle("Пополнить счёт");
             newStage.getIcons().add(icon);
             newStage.setScene(scene);
+            newStage.setResizable(false);
             newStage.show();
+
+            newStage.setOnCloseRequest(windowEvent -> {
+                openUserWindow(event);
+            });
+
+            Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            currentStage.hide();
 
         } catch (IOException e) {
             ErrorDialog.showError("Произошла ошибка: " + e.getMessage());
@@ -178,14 +292,18 @@ public class ButtonController {
 
     @FXML
     protected void handleDepositButtonClick(ActionEvent event) {
-
+        try {
         String amountText = amountField.getText();
         BigDecimal amount = new BigDecimal(amountText);
         User currentUser = InfoContext.getCurrentUser();
 
         ApiService.depositMoney(currentUser.getEmail(), amount);
+        openUserWindow(event);
 
         amountField.getScene().getWindow().hide();
+        } catch (Exception e) {
+            ErrorDialog.showError("Произошла ошибка при пополнении счета: " + e.getMessage());
+        }
     }
 
     public void handleAboutMenuItem(ActionEvent event) {
@@ -202,7 +320,6 @@ public class ButtonController {
             );
             alert.showAndWait();
         } else {
-            // Отобразить сообщение об ошибке, если currentUser или role равны null
             ErrorDialog.showError("Информация о пользователе недоступна");
         }
     }
@@ -220,35 +337,59 @@ public class ButtonController {
     }
 
     public void openSettingsMenuItem(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Настройки уведомлений");
-        alert.setHeaderText(null);
+        User currentUser = InfoContext.getCurrentUser();
+        ApiService.getNotificationType(currentUser.getEmail(), (currentNotificationType) -> {
+            Platform.runLater(() -> {
+                try {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Настройки уведомлений");
+                    alert.setHeaderText(null);
 
-        RadioButton smsRadioButton = new RadioButton("SMS уведомления");
-        RadioButton emailRadioButton = new RadioButton("Email уведомления");
-        emailRadioButton.setSelected(true);
+                    RadioButton smsRadioButton = new RadioButton("SMS уведомления");
+                    RadioButton emailRadioButton = new RadioButton("Email уведомления");
 
-        ToggleGroup toggleGroup = new ToggleGroup();
-        smsRadioButton.setToggleGroup(toggleGroup);
-        emailRadioButton.setToggleGroup(toggleGroup);
+                    // Устанавливаем выбор уведомлений в соответствии с текущим типом
+                    if ("sms".equalsIgnoreCase(currentNotificationType)) {
+                        smsRadioButton.setSelected(true);
+                    } else {
+                        emailRadioButton.setSelected(true);
+                    }
 
-        VBox vbox = new VBox(10);
-        vbox.getChildren().addAll(smsRadioButton, emailRadioButton);
-        vbox.setPadding(new Insets(20));
+                    ToggleGroup toggleGroup = new ToggleGroup();
+                    smsRadioButton.setToggleGroup(toggleGroup);
+                    emailRadioButton.setToggleGroup(toggleGroup);
 
-        alert.getDialogPane().setContent(vbox);
+                    VBox vbox = new VBox(10);
+                    vbox.getChildren().addAll(smsRadioButton, emailRadioButton);
+                    vbox.setPadding(new Insets(20));
 
-        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelButton = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().setAll(okButton, cancelButton);
+                    alert.getDialogPane().setContent(vbox);
 
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == okButton) {
-            boolean smsNotifications = smsRadioButton.isSelected();
-            boolean emailNotifications = emailRadioButton.isSelected();
+                    ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+                    ButtonType cancelButton = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+                    alert.getButtonTypes().setAll(okButton, cancelButton);
 
-            ApiService.saveNotificationSettings(smsNotifications, emailNotifications);
-        }
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.isPresent() && result.get() == okButton) {
+                        // Сохраняем новые настройки уведомлений в базе данных
+                        String newNotificationType = smsRadioButton.isSelected() ? "sms" : "email";
+                        ApiService.saveNotificationType(currentUser.getEmail(), newNotificationType, () -> {
+                            // Новые настройки успешно сохранены
+                            Platform.runLater(() -> {
+                                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                                successAlert.setTitle("Успех");
+                                successAlert.setHeaderText(null);
+                                successAlert.setContentText("Настройки уведомлений успешно сохранены");
+                                successAlert.showAndWait();
+                            });
+                        });
+                    }
+                } catch (Exception e) {
+                    // Обработка ошибок при получении или сохранении настроек уведомлений
+                    ErrorDialog.showError("Произошла ошибка при обработке настроек уведомлений: " + e.getMessage());
+                }
+            });
+        });
     }
 
     public void openHelpMenuItem(ActionEvent event) {
@@ -288,7 +429,6 @@ public class ButtonController {
                         tariffsInfo.append("\n");
                     }
 
-                    // Отобразить информацию о тарифах в диалоговом окне
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("О тарифах");
                     alert.setHeaderText(null);
@@ -300,6 +440,5 @@ public class ButtonController {
             });
         });
     }
-
 
 }

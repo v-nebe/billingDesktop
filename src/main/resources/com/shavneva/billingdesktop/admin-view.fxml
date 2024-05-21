@@ -51,6 +51,20 @@
                   <Image url="@images/9703596.png" />
                </image>
             </ImageView>
-         </left></BorderPane>
+         </left>
+         <bottom>
+            <GridPane prefHeight="65.0" prefWidth="599.0" BorderPane.alignment="CENTER">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Button mnemonicParsing="false" onAction="#generateUserReport" prefHeight="42.0" prefWidth="274.0" text="Получить отчёт" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+               </children>
+            </GridPane>
+         </bottom></BorderPane>
    </children>
 </AnchorPane>
