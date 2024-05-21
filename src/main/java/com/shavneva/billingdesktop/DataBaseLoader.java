@@ -6,16 +6,14 @@ import com.shavneva.billingdesktop.repository.CrudRepository;
 import com.shavneva.billingdesktop.repository.factory.CrudFactory;
 import com.shavneva.billingdesktop.service.ApiService;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -26,7 +24,12 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import javafx.util.StringConverter;
 import org.apache.poi.xwpf.usermodel.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -50,13 +53,6 @@ public class DataBaseLoader {
         TableColumn<User, String> passwordColumn = new TableColumn<>("Пароль");
         passwordColumn.setCellValueFactory(new PropertyValueFactory<>("password"));
 
-        ApiService.getAllUserInfo(users -> {
-            Platform.runLater(() -> {
-                ObservableList<User> userObservableList = FXCollections.observableArrayList(users);
-                table.setItems(userObservableList);
-            });
-        });
-
         TableColumn<User, String> tariffColumn = new TableColumn<>("Тариф");
         tariffColumn.setCellValueFactory(data -> {
             User user = data.getValue();
@@ -64,6 +60,16 @@ public class DataBaseLoader {
                 return new SimpleStringProperty(user.getTariff().getTariffName());
             } else {
                 return new SimpleStringProperty("Не указан");
+            }
+        });
+
+        TableColumn<User, String> roleColumn = new TableColumn<>("Роль");
+        roleColumn.setCellValueFactory(data -> {
+            User user = data.getValue();
+            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                return new SimpleStringProperty(user.getRoles().iterator().next().getRoleName());
+            } else {
+                return new SimpleStringProperty("Не указана");
             }
         });
 
@@ -77,17 +83,12 @@ public class DataBaseLoader {
             }
         });
 
-        TableColumn<User, String> roleColumn = new TableColumn<>("Роль");
-        roleColumn.setCellValueFactory(data -> {
-            User user = data.getValue();
-            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-                String roles = user.getRoles().stream()
-                        .map(Role::getRoleName)
-                        .collect(Collectors.joining(", "));
-                return new SimpleStringProperty(roles);
-            } else {
-                return new SimpleStringProperty("Не указан");
-            }
+        // Загрузка всех пользователей и настройка таблицы
+        ApiService.getAllUserInfo(users -> {
+            Platform.runLater(() -> {
+                ObservableList<User> userObservableList = FXCollections.observableArrayList(users);
+                table.setItems(userObservableList);
+            });
         });
 
         // Добавление столбцов в таблицу
@@ -98,7 +99,6 @@ public class DataBaseLoader {
         deleteButton.setOnAction(e -> deleteUser(table));
         Button editButton = new Button("Редактировать");
         editButton.setOnAction(e -> editUser(table));
-
 
         HBox buttonBox = new HBox(10);
         buttonBox.setPadding(new Insets(10));
@@ -121,13 +121,9 @@ public class DataBaseLoader {
             CrudRepository<User> userCrudRepository = CrudFactory.createUserRepository();
             userCrudRepository.delete(String.valueOf(user.getUserId()));
             table.getItems().remove(user);
+            showAlert("Успех", "Пользователь успешно удален.");
         } else {
-
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Предупреждение");
-            alert.setHeaderText(null);
-            alert.setContentText("Пожалуйста, выберите пользователя для удаления.");
-            alert.showAndWait();
+            showAlert("Предупреждение", "Пожалуйста, выберите пользователя для удаления.");
          }
     }
 
@@ -146,13 +142,10 @@ public class DataBaseLoader {
                 CrudRepository<User> userCrudRepository = CrudFactory.createUserRepository();
                 userCrudRepository.update(user);
                 table.refresh();
+                showAlert("Успех", "Пользователь успешно отредактирован.");
             }
         } else {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Предупреждение");
-            alert.setHeaderText(null);
-            alert.setContentText("Пожалуйста, выберите пользователя для редактирования.");
-            alert.showAndWait();
+            showAlert("Предупреждение", "Пожалуйста, выберите пользователя для редактирования.");
         }
     }
 
@@ -227,13 +220,9 @@ public class DataBaseLoader {
             CrudRepository<Tariff> tariffCrudRepository = CrudFactory.createTariffRepository();
             tariffCrudRepository.delete(String.valueOf(tariff.getTariffId()));
             table.getItems().remove(tariff );
+            showAlert("Успех", "Тариф успешно удален.");
         } else {
-
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Предупреждение");
-            alert.setHeaderText(null);
-            alert.setContentText("Пожалуйста, выберите тариф для удаления.");
-            alert.showAndWait();
+            showAlert("Предупреждение", "Пожалуйста, выберите тариф для удаления.");
         }
     }
 
@@ -252,13 +241,10 @@ public class DataBaseLoader {
                 CrudRepository<Tariff> tariffCrudRepository = CrudFactory.createTariffRepository();
                 tariffCrudRepository.update(tariff);
                 table.refresh();
+                showAlert("Успех", "Тариф успешно отредактирован.");
             }
         } else {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Предупреждение");
-            alert.setHeaderText(null);
-            alert.setContentText("Пожалуйста, выберите тариф для редактирования.");
-            alert.showAndWait();
+            showAlert("Предупреждение", "Пожалуйста, выберите тариф для редактирования.");
         }
     }
 
@@ -273,6 +259,7 @@ public class DataBaseLoader {
             tariffRepository.create(newTariff);
 
             table.getItems().add(newTariff);
+            showAlert("Успех", "Тариф успешно был добавлен.");
         }
     }
 
@@ -319,13 +306,9 @@ public class DataBaseLoader {
             CrudRepository<Services> serviceCrudRepository = CrudFactory.createServicesRepository();
             serviceCrudRepository.delete(String.valueOf(service.getServiceId()));
             table.getItems().remove(service);
+            showAlert("Успех", "Услуга успешно удалена.");
         } else {
-
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Предупреждение");
-            alert.setHeaderText(null);
-            alert.setContentText("Пожалуйста, выберите услуги для удаления.");
-            alert.showAndWait();
+            showAlert("Предупреждение", "Пожалуйста, выберите услугу для удаления.");
         }
     }
 
@@ -345,16 +328,10 @@ public class DataBaseLoader {
                 CrudRepository<Services> servicesCrudRepository = CrudFactory.createServicesRepository();
                 servicesCrudRepository.update(selectedService);
                 table.refresh();
+                showAlert("Успех", "Услуга успешно отредактирована.");
             }
-
-            table.refresh();
         } else {
-
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Предупреждение");
-            alert.setHeaderText(null);
-            alert.setContentText("Пожалуйста, выберите услугу для редактирования.");
-            alert.showAndWait();
+            showAlert("Предупреждение", "Пожалуйста, выберите услугу для редактирования.");
         }
 
     }
@@ -370,6 +347,7 @@ public class DataBaseLoader {
             servicesRepository.create(newService);
 
             table.getItems().add(newService);
+            showAlert("Успех", "Услуга успешно была добавлена.");
         }
     }
 
@@ -414,13 +392,9 @@ public class DataBaseLoader {
             CrudRepository<Account> accountCrudRepository = CrudFactory.createAccountRepository();
             accountCrudRepository.delete(String.valueOf( account.getAccountId()));
             table.getItems().remove( account);
+            showAlert("Успех", "Счёт успешно был удален.");
         } else {
-
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Предупреждение");
-            alert.setHeaderText(null);
-            alert.setContentText("Пожалуйста, выберите услуги для удаления.");
-            alert.showAndWait();
+            showAlert("Предупреждение", "Пожалуйста, выберите услуги для удаления.");
         }
     }
 
@@ -435,7 +409,16 @@ public class DataBaseLoader {
             accountRepository.create(newAccount);
 
             table.getItems().add(newAccount);
+            showAlert("Успех", "Счёт успешно был добавлен.");
         }
+    }
+
+    private void showAlert(String title, String contentText) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(contentText);
+        alert.showAndWait();
     }
 
     public void generateUserReport(ActionEvent event) {
