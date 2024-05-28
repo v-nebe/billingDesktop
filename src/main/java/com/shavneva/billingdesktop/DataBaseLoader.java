@@ -83,8 +83,9 @@ public class DataBaseLoader {
             }
         });
 
+
         // Загрузка всех пользователей и настройка таблицы
-        ApiService.getAllUserInfo(users -> {
+        ApiService.getAllUsers(users -> {
             Platform.runLater(() -> {
                 ObservableList<User> userObservableList = FXCollections.observableArrayList(users);
                 table.setItems(userObservableList);
@@ -423,7 +424,7 @@ public class DataBaseLoader {
 
     public void generateUserReport(ActionEvent event) {
         // Вызов метода из ApiService для получения информации о пользователях
-        ApiService.getAllUserInfo(users -> {
+        ApiService.getAllUsers(users -> {
             // Создание нового документа
             XWPFDocument document = new XWPFDocument();
 

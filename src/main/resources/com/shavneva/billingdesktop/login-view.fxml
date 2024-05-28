@@ -49,7 +49,7 @@
          <font>
             <Font size="15.0" />
          </font></Button>
-      <Button mnemonicParsing="false" onAction="#openRegistrationWindowClick" prefHeight="40.0" prefWidth="194.0" text="Зарегестрироваться">
+      <Button mnemonicParsing="false" onAction="#openRegistrationWindowClick" prefHeight="40.0" prefWidth="194.0" text="Зарегистрироваться">
          <font>
             <Font size="15.0" />
          </font></Button>

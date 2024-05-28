@@ -27,23 +27,31 @@ import java.util.Optional;
 public class ButtonController {
 
     @FXML
+    private Label userAmount;
+
+    @FXML
     private TextField login;
-    @FXML
-    private TextField name;
-    @FXML
-    private TextField surname;
-    @FXML
-    private TextField phoneNumber;
-    @FXML
-    private TextField email;
+
     @FXML
     private PasswordField passwordField;
+
     @FXML
-    private TextField repeatedPassword;
+    private TextField name;
+
+    @FXML
+    private TextField surname;
+
+    @FXML
+    private TextField email;
+
+    @FXML
+    private TextField phoneNumber;
+
+    @FXML
+    private PasswordField repeatedPassword;
+
     @FXML
     private TextField amountField;
-    @FXML
-    private Label userAmount;
     @FXML
     Image icon = new Image(LoginApplication.class.getResourceAsStream("/com/shavneva/billingdesktop/images/icon.png"));
 
@@ -89,6 +97,7 @@ public class ButtonController {
             loginStage.setTitle("Окно логинации");
             loginStage.getIcons().add(icon);
             loginStage.setScene(new Scene(root));
+            loginStage.setResizable(false);
             loginStage.show();
         } catch (IOException e) {
             ErrorDialog.showError("Произошла ошибка при загрузке FXML: " + e.getMessage());
@@ -130,7 +139,7 @@ public class ButtonController {
 
             ApiService.authenticateUser(userName, password, isAuthenticated -> {
                 if (isAuthenticated) {
-                    ApiService.getAllUserInfo(users -> {
+                    ApiService.getAllUsers(users -> {
                         User currentUser = findUserByUsername(users, userName);
                         if (currentUser != null) {
                             InfoContext.setCurrentUser(currentUser);
@@ -206,7 +215,7 @@ public class ButtonController {
                 openLoginWindow(event);
             });
 
-            ApiService.getAllUserInfo(users -> {
+            ApiService.getAllUsers(users -> {
                 User currentUser = InfoContext.getCurrentUser();
                 if (currentUser != null) {
                     Optional<User> optionalUser = users.stream()
@@ -399,7 +408,7 @@ public class ButtonController {
                 "   - Информация о профиле включает личные данные, такие как имя, фамилия, email и номер телефона\n" +
                 "2. Настройки уведомлений:\n" +
                 "   - Для настройки уведомлений выберите соответствующие опции в окне 'Настройки'\n" +
-                "   - Опции включают выбор типа уведомлений: SM или email\n" +
+                "   - Опции включают выбор типа уведомлений: SMS или email\n" +
                 "3. Просмотр тарифов:\n" +
                 "   - Для просмотра доступных тарифов нажмите кнопку 'Тарифы'\n" +
                 "   - В открывшемся окне отобразится список доступных тарифов\n" +

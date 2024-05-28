@@ -53,33 +53,10 @@ public class ApiService {
         callback.accept(true);
     }
 
-
-    public static void getAllUserInfo(Consumer<List<User>> callback) {
-        String url = BASE_URL + "/user/all-info-user";
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .build();
-
-        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .thenAccept(responseBody -> {
-                    try {
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-                        List<User> users = objectMapper.readValue(responseBody, new TypeReference<List<User>>() {});
-                        callback.accept(users);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        callback.accept(Collections.emptyList());
-                    }
-                })
-                .exceptionally(e -> {
-                    System.err.println("Error occurred: " + e);
-                    callback.accept(Collections.emptyList());
-                    return null;
-                });
+    public static void getAllUsers(Consumer<List<User>> callback) {
+        CrudRepository<User> userRepository = CrudFactory.createUserRepository();
+        List<User> users = userRepository.getAll();
+        callback.accept(users);
     }
 
     public static void getTariffWithServices(Consumer<List<Tariff>> callback) {
